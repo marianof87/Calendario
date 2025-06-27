@@ -1,6 +1,31 @@
 {
-  "eventos": [],
+  "eventos": [
+    {
+      "id": "evt_20250627_194440_0",
+      "titulo": "Reunión de prueba",
+      "fecha": "2024-01-15",
+      "hora": "14:30",
+      "descripcion": "Evento de prueba para verificar el sistema",
+      "fecha_creacion": "2025-06-27 19:44:40"
+    },
+    {
+      "id": "evt_20250627_195511_1",
+      "titulo": "Entrega Narciso",
+      "fecha": "2025-06-27",
+      "hora": null,
+      "descripcion": null,
+      "fecha_creacion": "2025-06-27 19:55:11"
+    },
+    {
+      "id": "evt_20250627_195534_2",
+      "titulo": "entrega",
+      "fecha": "2025-06-07",
+      "hora": null,
+      "descripcion": null,
+      "fecha_creacion": "2025-06-27 19:55:34"
+    }
+  ],
   "version": "1.0",
-  "fecha_creacion": "2025-01-15",
-  "descripcion": "Archivo de datos para eventos del calendario"
+  "fecha_actualizacion": "2025-06-27 19:55:34",
+  "total_eventos": 3
 }
