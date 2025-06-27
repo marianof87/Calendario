@@ -1,66 +1,58 @@
-import datetime
+"""
+Main.py - Punto de entrada del sistema de calendario
+
+Este módulo es el punto de entrada principal de la aplicación.
+Solo se encarga de:
+- Inicialización de la ventana principal
+- Configuración inicial del tema
+- Arranque de la aplicación
+
+Toda la lógica está distribuida en módulos especializados:
+- calendario_ui.py: Interfaz gráfica
+- calendario_logic.py: Lógica del calendario
+- theme_manager.py: Gestión de temas  
+- helpers.py: Funciones de utilidad
+
+Autor: Mariano Capella, Gabriel Osemberg
+"""
+
 import ttkbootstrap as tb
-from ttkbootstrap.constants import *
+from calendario_ui import CalendarioUI
 
-class CalendarioApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Calendario")
-        self.style = tb.Style("litera")  # Podés cambiar el tema: cosmo, flatly, darkly, etc.
 
-        self.hoy = datetime.date.today()
-        self.fecha_actual = self.hoy.replace(day=1)
+def main():
+    """
+    Función principal de la aplicación.
+    
+    Inicializa la ventana principal y arranca la aplicación.
+    """
+    # Crear ventana principal con tema por defecto
+    root = tb.Window(themename="litera")
+    
+    # Configurar propiedades de la ventana
+    root.geometry("800x600")  # Tamaño inicial
+    root.minsize(600, 400)    # Tamaño mínimo
+    
+    # Crear la aplicación del calendario
+    app = CalendarioUI(root)
+    
+    # Mostrar información inicial en consola
+    print("🗓️  Sistema de Calendario iniciado")
+    print("   Desarrollado por: Mariano Capella & Gabriel Osemberg")
+    print("   Tecnologías: Python + ttkbootstrap")
+    print(f"   Tema inicial: {app.get_theme_manager().get_tema_actual()}")
+    print("   ¡Disfruta usando el calendario! 🎉")
+    
+    # Iniciar el loop principal de la aplicación
+    try:
+        root.mainloop()
+    except KeyboardInterrupt:
+        print("\n👋 Aplicación cerrada por el usuario")
+    except Exception as e:
+        print(f"❌ Error inesperado: {e}")
+    finally:
+        print("🔒 Cerrando sistema de calendario...")
 
-        self.crear_widgets()
 
-    def crear_widgets(self):
-        # Frame superior para la cabecera (mes, año y botones)
-        top_frame = tb.Frame(self.root, padding=10)
-        top_frame.pack(fill=X)
-
-        # Botones de navegación
-        btn_ano_ant = tb.Button(top_frame, text="<<", bootstyle=SECONDARY, command=self.ir_ano_anterior)
-        btn_mes_ant = tb.Button(top_frame, text="<", bootstyle=SECONDARY, command=self.ir_mes_anterior)
-        btn_hoy = tb.Button(top_frame, text="Hoy", bootstyle=INFO, command=self.ir_a_hoy)
-        btn_mes_sig = tb.Button(top_frame, text=">", bootstyle=SECONDARY, command=self.ir_mes_siguiente)
-        btn_ano_sig = tb.Button(top_frame, text=">>", bootstyle=SECONDARY, command=self.ir_ano_siguiente)
-
-        btn_ano_ant.pack(side=LEFT, padx=5)
-        btn_mes_ant.pack(side=LEFT, padx=5)
-        btn_hoy.pack(side=LEFT, padx=5)
-        btn_mes_sig.pack(side=LEFT, padx=5)
-        btn_ano_sig.pack(side=LEFT, padx=5)
-
-        # Etiqueta para mostrar mes y año
-        self.label_fecha = tb.Label(top_frame, text=self.obtener_nombre_mes(), font=("Arial", 18, "bold"))
-        self.label_fecha.pack(side=RIGHT)
-
-        # Frame central para el calendario (a desarrollar en la próxima fase)
-        self.frame_calendario = tb.Frame(self.root, padding=10)
-        self.frame_calendario.pack(fill=BOTH, expand=True)
-
-    def obtener_nombre_mes(self):
-        return self.fecha_actual.strftime("%B %Y").capitalize()
-
-    # Funciones de navegación (vacías por ahora)
-    def ir_ano_anterior(self):
-        pass
-
-    def ir_ano_siguiente(self):
-        pass
-
-    def ir_mes_anterior(self):
-        pass
-
-    def ir_mes_siguiente(self):
-        pass
-
-    def ir_a_hoy(self):
-        self.fecha_actual = self.hoy.replace(day=1)
-        self.label_fecha.config(text=self.obtener_nombre_mes())
-
-# Ejecutar la app
 if __name__ == "__main__":
-    root = tb.Window(themename="litera")  # podés probar otros: morph, cyborg, lumen...
-    app = CalendarioApp(root)
-    root.mainloop()
+    main()
