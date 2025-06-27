@@ -8,6 +8,17 @@ gabriel Osemberg
   ttkbootstrap
   https://github.com/israel-dryer/ttkbootstrap
   pip install ttkbootstrap
+
+  ESTRUCTURA DEL SISTEMA
+
+  /calendario_app
+├── main.py              # archivo principal que inicia la app
+├── calendario.py        # lógica para generar vista mensual/semanal
+├── eventos.py           # manejo de eventos (añadir, eliminar, cargar)
+├── helpers.py           # funciones de ayuda (formato de fecha, etc.)
+├── data/
+│   └── eventos.json     # almacenamiento de eventos
+
   
 - Historias de Usuario y Cretirios de aceotacion:
   
