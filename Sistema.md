@@ -7,6 +7,8 @@ gabriel Osemberg
 - Libreria Python utilizada:
   ttkbootstrap
   https://github.com/israel-dryer/ttkbootstrap
+  pip install ttkbootstrap
+  
 - Historias de Usuario y Cretirios de aceotacion:
   
 - 1. Agregar evento
