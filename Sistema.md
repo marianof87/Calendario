@@ -6,7 +6,7 @@ gabriel Osemberg
 
 - Historias de Usuario y Cretirios de aceotacion:
   
-1. Agregar evento
+- 1. Agregar evento
 Historia:
 Como usuario del calendario, quiero poder agregar un evento con una fecha y hora específicas, para recordar compromisos importantes.
 
@@ -31,7 +31,7 @@ Una vez validado, el evento debe guardarse correctamente y confirmarse con un me
 
 El evento debe persistir si el sistema se cierra y se vuelve a abrir (guardado en archivo o base de datos)
 
- Ver eventos del día
+- 2. Ver eventos del día
 Como usuario del calendario, quiero poder ver todos los eventos programados para un día específico, para planificar mi jornada eficientemente.
 
 Criterios de aceptación:
@@ -48,7 +48,7 @@ Ordenarlos cronológicamente por hora.
 
 Si el usuario ingresa una fecha inválida, debe mostrar un mensaje de error y permitir volver a intentarlo
 
-3. Eliminar evento
+- 3. Eliminar evento
 Como usuario del calendario, quiero poder eliminar un evento previamente creado, para mantener actualizado mi calendario si hay cambios.
 
 Criterios de aceptación:
@@ -64,7 +64,7 @@ Si se confirma, el evento debe eliminarse y mostrar un mensaje: "Evento eliminad
 
 Si no se encuentra el evento, debe mostrarse un mensaje claro: "Evento no encontrado."
 
-4. Editar evento
+- 4. Editar evento
 Como usuario del calendario, quiero poder modificar la información de un evento existente, para corregir errores o cambiar detalles como la hora o el nombre.
 
 Criterios de aceptación:
@@ -87,7 +87,7 @@ Cada entrada modificada debe validarse (por ejemplo, la nueva fecha debe ser vá
 
 Tras la edición, debe mostrarse una confirmación del cambio y guardar los nuevos datos.
 
-5. Listar eventos del mes
+- 5. Listar eventos del mes
 Como usuario del calendario, quiero poder ver un resumen de los eventos de todo un mes, para tener una visión general de mi agenda mensual.
 
 Criterios de aceptación:
@@ -106,7 +106,7 @@ Dentro de cada día, ordenarlos por hora.
 
 Mostrar: Fecha → Título → Hora → Descripción.
 
-6. Buscar evento por nombre
+- 6. Buscar evento por nombre
 Como usuario del calendario, quiero poder buscar un evento por su nombre, para encontrar rápidamente información específica sin revisar día por día.
 
 Criterios de aceptación:
@@ -121,7 +121,7 @@ Para cada resultado, debe mostrar: Fecha, Hora, Título, Descripción.
 
 Si no hay coincidencias, debe decir: "No se encontraron eventos con ese nombre."
 
-7. Ver calendario en formato mensual
+- 7. Ver calendario en formato mensual
 Como usuario, quiero ver un calendario visual del mes con los días resaltados que tienen eventos, para identificar fácilmente los días ocupados.
 
 Criterios de aceptación:
@@ -136,7 +136,7 @@ Si no hay eventos, mostrar el calendario en limpio.
 
 Si hay eventos, debe haber una opción para ver los detalles de un día desde el calendario.
 
-8. Notificación de eventos próximos
+- 8. Notificación de eventos próximos
 Como usuario, quiero recibir una notificación o mensaje cuando un evento se aproxima, para asegurarme de no olvidarlo.
 
 Criterios de aceptación:
@@ -150,7 +150,7 @@ La lógica debe considerar la hora actual del sistema.
 
 Los eventos pasados no deben mostrarse como recordatorio.
 
-9. Evitar conflictos de horario
+- 9. Evitar conflictos de horario
 Como usuario, quiero recibir una advertencia si intento crear un evento que se superpone con otro, para evitar solapamientos de compromisos.
 
 Criterios de aceptación:
@@ -164,7 +164,7 @@ Si el usuario elige continuar, se permite la superposición; si no, el evento no
 
 Debe funcionar también al editar un evento existente.
 
-10. Guardar eventos entre sesiones
+- 10. Guardar eventos entre sesiones
 Como usuario del calendario, quiero que mis eventos se guarden incluso si cierro el programa, para no perder información cuando vuelva a abrirlo.
 
 Criterios de aceptación:
@@ -179,4 +179,3 @@ Si el archivo no existe, debe crearse uno nuevo sin errores.
 
 La carga y guardado deben ser silenciosos y automáticos para el usuario.
 
-- Historias de Usuario
