@@ -1,15 +1,26 @@
 """
-Evento_Dialogs.py - Ventanas modales para gestión de eventos
+Evento_Dialogs.py - Módulo de compatibilidad y migración gradual
 
-Este módulo se encarga de:
-- Ventanas modales para agregar/editar eventos
-- Visualización de eventos del día
-- Confirmaciones de eliminación
-- Validación de formularios
-- Interfaz de búsqueda de eventos
+IMPORTANTE: Este módulo está siendo migrado a la nueva arquitectura.
+- Los diálogos modernos están en enhanced_event_dialogs.py
+- Este archivo mantiene compatibilidad temporal
+- Progresivamente se migrarán todas las referencias
+
+Nueva Arquitectura Implementada:
+- dialog_base.py: Clase base abstracta con principios SOLID
+- dialog_components.py: Componentes reutilizables
+- enhanced_event_dialogs.py: Diálogos modernos refactorizados
 
 Autor: Mariano Capella, Gabriel Osemberg
 """
+
+# Importar implementaciones modernas
+try:
+    from enhanced_event_dialogs import EnhancedEventDialog
+    from dialog_base import BaseDialog
+    MODERN_DIALOGS_AVAILABLE = True
+except ImportError:
+    MODERN_DIALOGS_AVAILABLE = False
 
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
@@ -20,8 +31,13 @@ from eventos import Evento, EventosManager
 from helpers import formatear_fecha_completa, validar_fecha
 
 
-class EventoDialog:
-    """Ventana modal base para gestión de eventos."""
+# Alias para compatibilidad - redirige a implementación moderna
+if MODERN_DIALOGS_AVAILABLE:
+    EventoDialog = EnhancedEventDialog
+else:
+    # Implementación fallback
+    class EventoDialog:
+        """Ventana modal base para gestión de eventos."""
     
     def __init__(self, parent, title: str, evento: Optional[Evento] = None):
         self.parent = parent
