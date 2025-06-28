@@ -1,27 +1,43 @@
 """
-Evento_Dialogs.py - Ventanas modales para gestión de eventos
+Evento_Dialogs.py - Módulo de compatibilidad y migración gradual
 
-Este módulo se encarga de:
-- Ventanas modales para agregar/editar eventos
-- Visualización de eventos del día
-- Confirmaciones de eliminación
-- Validación de formularios
-- Interfaz de búsqueda de eventos
+IMPORTANTE: Este módulo está siendo migrado a la nueva arquitectura.
+- Los diálogos modernos están en enhanced_event_dialogs.py
+- Este archivo mantiene compatibilidad temporal
+- Progresivamente se migrarán todas las referencias
+
+Nueva Arquitectura Implementada:
+- dialog_base.py: Clase base abstracta con principios SOLID
+- dialog_components.py: Componentes reutilizables
+- enhanced_event_dialogs.py: Diálogos modernos refactorizados
 
 Autor: Mariano Capella, Gabriel Osemberg
 """
+
+# Importar implementaciones modernas
+try:
+    from src.dialogs.enhanced_event_dialogs import EnhancedEventDialog
+    from src.dialogs.dialog_base import BaseDialog
+    MODERN_DIALOGS_AVAILABLE = True
+except ImportError:
+    MODERN_DIALOGS_AVAILABLE = False
 
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
 from ttkbootstrap.dialogs import Messagebox
 import datetime
 from typing import Optional, List, Callable, Tuple
-from eventos import Evento, EventosManager
-from helpers import formatear_fecha_completa, validar_fecha
+from src.core.eventos import Evento, EventosManager
+from src.utils.helpers import formatear_fecha_completa, validar_fecha
 
 
-class EventoDialog:
-    """Ventana modal base para gestión de eventos."""
+# Alias para compatibilidad - redirige a implementación moderna
+if MODERN_DIALOGS_AVAILABLE:
+    EventoDialog = EnhancedEventDialog
+else:
+    # Implementación fallback
+    class EventoDialog:
+        """Ventana modal base para gestión de eventos."""
     
     def __init__(self, parent, title: str, evento: Optional[Evento] = None):
         self.parent = parent
@@ -390,12 +406,15 @@ class EventosDelDiaDialog:
     
     def _agregar_evento(self) -> None:
         """Abre el diálogo para agregar un nuevo evento."""
-        dialog = EventoDialog(self.window, "Agregar Evento")
+        dialog = EventoDialog(self.window)  # Sin parámetro de título
         
-        # Pre-establecer la fecha
-        dialog.var_fecha.set(self.fecha.strftime("%Y-%m-%d"))
+        # Pre-establecer la fecha si el dialog tiene este campo
+        if hasattr(dialog, 'var_fecha'):
+            dialog.var_fecha.set(self.fecha.strftime("%Y-%m-%d"))
+        elif hasattr(dialog, 'field_fecha'):
+            dialog.field_fecha.set_value(self.fecha.strftime("%Y-%m-%d"))
         
-        resultado = dialog.mostrar()
+        resultado = dialog.mostrar() if hasattr(dialog, 'mostrar') else dialog.show()
         if resultado:
             # Agregar evento
             exito, mensaje, evento = self.eventos_manager.agregar_evento(
@@ -429,8 +448,8 @@ class EventosDelDiaDialog:
         evento = self.eventos_manager.buscar_evento_por_id(evento_id)
         
         if evento:
-            dialog = EventoDialog(self.window, "Editar Evento", evento)
-            resultado = dialog.mostrar()
+            dialog = EventoDialog(self.window, evento)  # Pasar el evento como segundo parámetro
+            resultado = dialog.mostrar() if hasattr(dialog, 'mostrar') else dialog.show()
             
             if resultado:
                 # Actualizar evento

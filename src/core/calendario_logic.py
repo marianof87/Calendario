@@ -12,7 +12,7 @@ Autor: Mariano Capella, Gabriel Osemberg
 
 import datetime
 from typing import Callable, Optional, List, Tuple
-from helpers import (
+from src.utils.helpers import (
     obtener_nombre_mes, es_dia_actual, obtener_calendario_mes,
     navegar_mes, navegar_año, ir_a_hoy
 )
