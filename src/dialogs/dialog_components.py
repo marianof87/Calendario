@@ -31,7 +31,7 @@ class ValidationMixin:
         """Agrega regla de validación."""
         self.validation_rules.append((rule, error_message))
     
-    def validate(self, value: str) -> bool:
+    def validate_content(self, value: str) -> bool:
         """Valida el valor según las reglas establecidas."""
         for rule, message in self.validation_rules:
             if not rule(value):
@@ -98,23 +98,41 @@ class SmartEntry(tb.Entry, ValidationMixin):
     
     def _validate_date(self, value: str) -> bool:
         """Valida formato de fecha."""
-        if not value:
+        if not value or not value.strip():
             return True  # Permitir vacío si no es requerido
+        
+        value = value.strip()  # Limpiar espacios
+        
         try:
-            datetime.strptime(value, "%Y-%m-%d")
+            # Validar formato YYYY-MM-DD
+            parsed_date = datetime.strptime(value, "%Y-%m-%d")
             return True
         except ValueError:
-            return False
+            try:
+                # Intentar otros formatos comunes como fallback
+                datetime.strptime(value, "%d/%m/%Y")
+                return False  # Formato incorrecto pero fecha válida
+            except ValueError:
+                return False
     
     def _validate_time(self, value: str) -> bool:
         """Valida formato de hora."""
-        if not value:
+        if not value or not value.strip():
             return True  # Permitir vacío
+        
+        value = value.strip()  # Limpiar espacios
+        
         try:
-            datetime.strptime(value, "%H:%M")
+            # Validar formato HH:MM
+            parsed_time = datetime.strptime(value, "%H:%M")
             return True
         except ValueError:
-            return False
+            try:
+                # Intentar formato HH:MM:SS como fallback
+                datetime.strptime(value, "%H:%M:%S")
+                return False  # Formato incorrecto pero hora válida
+            except ValueError:
+                return False
     
     def _setup_bindings(self) -> None:
         """Configura bindings de eventos."""
@@ -147,7 +165,7 @@ class SmartEntry(tb.Entry, ValidationMixin):
     def _validate_and_update_style(self) -> None:
         """Valida y actualiza estilo visual."""
         value = self.get()
-        if value and not self.validate(value):
+        if value and not self.validate_content(value):
             self.configure(bootstyle=DANGER)
         else:
             self.configure(bootstyle=self.original_bootstyle)
@@ -161,7 +179,7 @@ class SmartEntry(tb.Entry, ValidationMixin):
     def is_valid(self) -> bool:
         """Verifica si el valor actual es válido."""
         value = self.get_real_value()
-        return self.validate(value) if value else True
+        return self.validate_content(value) if value else True
 
 
 class SmartText(tb.Text):
@@ -473,12 +491,26 @@ class FormField:
     
     def set_value(self, value: str) -> None:
         """Establece el valor del campo."""
-        if hasattr(self.input_widget, 'delete') and hasattr(self.input_widget, 'insert'):
-            self.input_widget.delete(0, END)
+        if self.field_type == "entry" and hasattr(self.input_widget, 'delete') and hasattr(self.input_widget, 'insert'):
+            # Limpiar placeholder si está activo
+            if hasattr(self.input_widget, '_placeholder_active') and self.input_widget._placeholder_active:
+                self.input_widget.delete(0, END)
+                self.input_widget._placeholder_active = False
+                self.input_widget.configure(bootstyle=self.input_widget.original_bootstyle)
+            else:
+                self.input_widget.delete(0, END)
+            
             self.input_widget.insert(0, value)
-        elif hasattr(self.input_widget, 'delete') and hasattr(self.input_widget, 'insert'):
+            
+            # Forzar revalidación para actualizar estilo visual
+            if hasattr(self.input_widget, '_validate_and_update_style'):
+                self.input_widget._validate_and_update_style()
+                
+        elif self.field_type == "text" and hasattr(self.input_widget, 'delete') and hasattr(self.input_widget, 'insert'):
             self.input_widget.delete("1.0", END)
             self.input_widget.insert("1.0", value)
+        elif hasattr(self.input_widget, 'set'):
+            self.input_widget.set(value)
     
     def is_valid(self) -> bool:
         """Verifica si el campo es válido."""

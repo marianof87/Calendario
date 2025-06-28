@@ -16,8 +16,8 @@ Autor: Mariano Capella, Gabriel Osemberg
 
 # Importar implementaciones modernas
 try:
-    from enhanced_event_dialogs import EnhancedEventDialog
-    from dialog_base import BaseDialog
+    from src.dialogs.enhanced_event_dialogs import EnhancedEventDialog
+    from src.dialogs.dialog_base import BaseDialog
     MODERN_DIALOGS_AVAILABLE = True
 except ImportError:
     MODERN_DIALOGS_AVAILABLE = False
@@ -27,8 +27,8 @@ from ttkbootstrap.constants import *
 from ttkbootstrap.dialogs import Messagebox
 import datetime
 from typing import Optional, List, Callable, Tuple
-from eventos import Evento, EventosManager
-from helpers import formatear_fecha_completa, validar_fecha
+from src.core.eventos import Evento, EventosManager
+from src.utils.helpers import formatear_fecha_completa, validar_fecha
 
 
 # Alias para compatibilidad - redirige a implementación moderna
@@ -406,12 +406,15 @@ class EventosDelDiaDialog:
     
     def _agregar_evento(self) -> None:
         """Abre el diálogo para agregar un nuevo evento."""
-        dialog = EventoDialog(self.window, "Agregar Evento")
+        dialog = EventoDialog(self.window)  # Sin parámetro de título
         
-        # Pre-establecer la fecha
-        dialog.var_fecha.set(self.fecha.strftime("%Y-%m-%d"))
+        # Pre-establecer la fecha si el dialog tiene este campo
+        if hasattr(dialog, 'var_fecha'):
+            dialog.var_fecha.set(self.fecha.strftime("%Y-%m-%d"))
+        elif hasattr(dialog, 'field_fecha'):
+            dialog.field_fecha.set_value(self.fecha.strftime("%Y-%m-%d"))
         
-        resultado = dialog.mostrar()
+        resultado = dialog.mostrar() if hasattr(dialog, 'mostrar') else dialog.show()
         if resultado:
             # Agregar evento
             exito, mensaje, evento = self.eventos_manager.agregar_evento(
@@ -445,8 +448,8 @@ class EventosDelDiaDialog:
         evento = self.eventos_manager.buscar_evento_por_id(evento_id)
         
         if evento:
-            dialog = EventoDialog(self.window, "Editar Evento", evento)
-            resultado = dialog.mostrar()
+            dialog = EventoDialog(self.window, evento)  # Pasar el evento como segundo parámetro
+            resultado = dialog.mostrar() if hasattr(dialog, 'mostrar') else dialog.show()
             
             if resultado:
                 # Actualizar evento

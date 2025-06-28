@@ -1,194 +1,206 @@
-Sistema de Calendario en Python
+# 🗓️ Sistema de Calendario - Especificación Técnica
 
-- Integrantes del equipo:
-  Mariano Capella
-  gabriel Osemberg
+**Desarrollado por:** Mariano Capella & Gabriel Osemberg  
+**Tecnología:** Python + ttkbootstrap  
+**Arquitectura:** Modular con principios SOLID
 
-- Libreria Python utilizada:
-  ttkbootstrap
-  https://github.com/israel-dryer/ttkbootstrap
-  pip install ttkbootstrap
+---
 
-  ESTRUCTURA DEL SISTEMA
+## 📖 **¿Qué hace el sistema?**
 
-  /calendario_app
-  ├── main.py # archivo principal que inicia la app
-  ├── calendario.py # lógica para generar vista mensual/semanal
-  ├── eventos.py # manejo de eventos (añadir, eliminar, cargar)
-  ├── helpers.py # funciones de ayuda (formato de fecha, etc.)
-  ├── data/
-  │ └── eventos.json # almacenamiento de eventos
+Sistema de calendario moderno con **interfaz gráfica profesional** que permite:
 
-- Historias de Usuario y Cretirios de aceptacion:
-- 1. Agregar evento
-     Historia:
-     Como usuario del calendario, quiero poder agregar un evento con una fecha y hora específicas, para recordar compromisos importantes.
+- ✅ **Navegación temporal** - Navegar entre meses/años con controles intuitivos
+- ✅ **Gestión de eventos** - Crear, editar, eliminar y buscar eventos
+- ✅ **Vista calendario** - Grilla visual con días destacados cuando tienen eventos
+- ✅ **Notificaciones** - Alertas sonoras para eventos próximos y actuales
+- ✅ **Temas dinámicos** - 20+ temas visuales (claros/oscuros) cambiables en tiempo real
+- ✅ **Persistencia** - Eventos guardados en JSON que persisten entre sesiones
 
-Criterios de aceptación:
+---
 
-El sistema debe solicitar al usuario los siguientes datos:
+## 🏗️ **Diagrama de Arquitectura**
 
-Título del evento (obligatorio)
+```
+Calendario/
+├── 📁 src/                          # Código fuente principal
+│   ├── 📁 core/                     # Lógica de negocio
+│   │   ├── eventos.py               # Modelo Evento + EventosManager
+│   │   └── calendario_logic.py      # Lógica del calendario
+│   │
+│   ├── 📁 ui/                       # Interfaces gráficas
+│   │   ├── calendario_ui.py         # Interfaz principal
+│   │   └── theme_manager.py         # Gestor de temas
+│   │
+│   ├── 📁 dialogs/                  # Diálogos y componentes
+│   │   ├── dialog_base.py           # Clase base abstracta
+│   │   ├── dialog_components.py     # Componentes reutilizables
+│   │   └── enhanced_event_dialogs.py # Diálogos modernos
+│   │
+│   ├── 📁 notifications/            # Sistema de notificaciones
+│   │   ├── notificaciones.py        # NotificacionesManager
+│   │   └── notificacion_timer.py    # Timer en tiempo real
+│   │
+│   └── 📁 utils/                    # Utilidades
+│       └── helpers.py               # Funciones auxiliares
+│
+├── 📁 data/                         # Archivos de datos
+│   └── eventos.json                 # Base de datos JSON
+│
+└── 📋 main.py                       # Punto de entrada
+```
 
-Fecha (en formato válido, por ejemplo: YYYY-MM-DD)
+### **🔧 Principios Aplicados**
 
-Hora (opcional; en formato HH:MM de 24 horas)
+- **Separación de responsabilidades** - Cada módulo tiene un propósito específico
+- **Arquitectura SOLID** - Extensible, mantenible, testeable
+- **Componentes reutilizables** - UI modular con validación en tiempo real
+- **Gestión robusta** - Manejo de errores, logging, memoria optimizada
 
-Descripción (opcional)
+---
 
-Si la fecha ingresada no es válida, el sistema debe mostrar un mensaje de error claro.
+## 👤 **Historias de Usuario**
 
-Si el título está vacío, debe impedir la creación y mostrar un mensaje de error.
+### **1. Agregar Evento**
 
-Una vez validado, el evento debe guardarse correctamente y confirmarse con un mensaje tipo:
-"Evento 'Reunión' creado para el 2025-07-01 a las 14:00."
+**Como usuario del calendario, quiero poder agregar un evento con una fecha y hora específicas, para recordar compromisos importantes.**
 
-El evento debe persistir si el sistema se cierra y se vuelve a abrir (guardado en archivo o base de datos)
+**Criterios de aceptación:**
 
-- 2. Ver eventos del día
-     Como usuario del calendario, quiero poder ver todos los eventos programados para un día específico, para planificar mi jornada eficientemente.
+- ✅ Solicitar: Título (obligatorio), Fecha (YYYY-MM-DD), Hora (HH:MM opcional), Descripción (opcional)
+- ✅ Validar fecha y hora con feedback visual en tiempo real
+- ✅ Mostrar error si título vacío o fecha inválida
+- ✅ Confirmar creación: _"Evento 'Reunión' creado para el 2025-07-01 a las 14:00"_
+- ✅ Persistir evento automáticamente en JSON
 
-Criterios de aceptación:
+### **2. Ver Eventos del Día**
 
-El sistema debe solicitar al usuario una fecha válida.
+**Como usuario del calendario, quiero poder ver todos los eventos programados para un día específico, para planificar mi jornada eficientemente.**
 
-Si no hay eventos para esa fecha, debe indicar: "No hay eventos para esta fecha."
+**Criterios de aceptación:**
 
-Si hay eventos:
+- ✅ Click en día del calendario abre lista de eventos
+- ✅ Mostrar _"No hay eventos para esta fecha"_ si está vacío
+- ✅ Ordenar eventos cronológicamente por hora
+- ✅ Mostrar título, hora y descripción de cada evento
+- ✅ Permitir editar/eliminar desde la lista
 
-Mostrar título, hora (si aplica) y descripción para cada evento.
+### **3. Eliminar Evento**
 
-Ordenarlos cronológicamente por hora.
+**Como usuario del calendario, quiero poder eliminar un evento previamente creado, para mantener actualizado mi calendario si hay cambios.**
 
-Si el usuario ingresa una fecha inválida, debe mostrar un mensaje de error y permitir volver a intentarlo
+**Criterios de aceptación:**
 
-- 3. Eliminar evento
-     Como usuario del calendario, quiero poder eliminar un evento previamente creado, para mantener actualizado mi calendario si hay cambios.
+- ✅ Seleccionar evento desde lista del día
+- ✅ Mostrar resumen antes de confirmar eliminación
+- ✅ Solicitar confirmación: _"¿Está seguro que desea eliminar este evento?"_
+- ✅ Confirmar eliminación: _"Evento eliminado exitosamente"_
+- ✅ Actualizar vista automáticamente
 
-Criterios de aceptación:
+### **4. Editar Evento**
 
-El sistema debe permitir al usuario seleccionar un evento por fecha y título (o ID si se usa).
+**Como usuario del calendario, quiero poder modificar la información de un evento existente, para corregir errores o cambiar detalles.**
 
-Debe mostrar un resumen del evento antes de confirmar su eliminación.
+**Criterios de aceptación:**
 
-Requiere una confirmación del usuario:
-"¿Está seguro que desea eliminar este evento? (S/N)"
+- ✅ Abrir evento desde lista para edición
+- ✅ Mostrar formulario con datos actuales pre-cargados
+- ✅ Validar cada campo modificado (fecha, hora, título)
+- ✅ Confirmar cambios y actualizar vista
+- ✅ Mantener validación en tiempo real
 
-Si se confirma, el evento debe eliminarse y mostrar un mensaje: "Evento eliminado exitosamente."
+### **5. Listar Eventos del Mes**
 
-Si no se encuentra el evento, debe mostrarse un mensaje claro: "Evento no encontrado."
+**Como usuario del calendario, quiero poder ver un resumen de los eventos de todo un mes, para tener una visión general de mi agenda mensual.**
 
-- 4. Editar evento
-     Como usuario del calendario, quiero poder modificar la información de un evento existente, para corregir errores o cambiar detalles como la hora o el nombre.
+**Criterios de aceptación:**
 
-Criterios de aceptación:
+- ✅ Botón "📅 Mes" muestra todos los eventos del mes actual
+- ✅ Agrupar eventos por fecha
+- ✅ Ordenar por fecha y hora dentro de cada día
+- ✅ Mostrar: Fecha → Título → Hora → Descripción
+- ✅ Indicar si no hay eventos: _"No hay eventos registrados en este mes"_
 
-El sistema debe listar eventos por fecha o permitir búsqueda por nombre.
+### **6. Buscar Evento por Nombre**
 
-Una vez seleccionado, debe mostrar los detalles actuales del evento.
+**Como usuario del calendario, quiero poder buscar un evento por su nombre, para encontrar rápidamente información específica.**
 
-El usuario puede editar uno o varios de los siguientes campos:
+**Criterios de aceptación:**
 
-Título
+- ✅ Botón "🔍 Buscar" abre diálogo de búsqueda
+- ✅ Búsqueda no sensible a mayúsculas/minúsculas
+- ✅ Mostrar coincidencias en tiempo real mientras se escribe
+- ✅ Mostrar: Fecha, Hora, Título, Descripción para cada resultado
+- ✅ Indicar: _"No se encontraron eventos con ese nombre"_
 
-Fecha
+### **7. Ver Calendario en Formato Mensual**
 
-Hora
+**Como usuario, quiero ver un calendario visual del mes con los días resaltados que tienen eventos, para identificar fácilmente los días ocupados.**
 
-Descripción
+**Criterios de aceptación:**
 
-Cada entrada modificada debe validarse (por ejemplo, la nueva fecha debe ser válida).
+- ✅ Vista calendario con grilla 7x6 (días de la semana)
+- ✅ Días con eventos destacados visualmente
+- ✅ Navegación: << < Hoy > >> (año anterior, mes anterior, hoy, mes siguiente, año siguiente)
+- ✅ Día actual resaltado en color diferente
+- ✅ Click en día muestra eventos específicos
 
-Tras la edición, debe mostrarse una confirmación del cambio y guardar los nuevos datos.
+### **8. Notificación de Eventos Próximos (Optimizado)**
 
-- 5. Listar eventos del mes
-     Como usuario del calendario, quiero poder ver un resumen de los eventos de todo un mes, para tener una visión general de mi agenda mensual.
+**Como usuario, quiero recibir una notificación cuando un evento se aproxima, sin que el sistema se sobrecargue o se trabe.**
 
-Criterios de aceptación:
+**Criterios de aceptación:**
 
-El sistema debe pedir al usuario una fecha de referencia (para determinar el mes).
+- ✅ **Verificación inteligente** cada 60 segundos en segundo plano
+- ✅ **Protección contra sobrecargas**:
+  - ⏸️ Auto-pausa de 5 minutos durante eventos activos
+  - 🛡️ Mínimo 30 segundos entre notificaciones
+  - 🔊 Sonido ejecutado en hilo separado (no bloqueante)
+- ✅ **Controles manuales disponibles**:
+  - 🔔 **Test**: Botón para probar notificaciones
+  - ▶️ **Reanudar**: Reanudar timer si queda pausado
+  - 📊 **Stats**: Ver estadísticas del sistema
+- ✅ **Solo eventos actuales** (±2 min): Evita spam de notificaciones
+- ✅ **Una notificación por evento por día**: Evita duplicados
 
-El sistema debe buscar todos los eventos cuya fecha pertenezca al mismo mes y año.
+### **9. Evitar Conflictos de Horario**
 
-Si no hay eventos, mostrar: "No hay eventos registrados en este mes."
+**Como usuario, quiero recibir una advertencia si intento crear un evento que se superpone con otro, para evitar solapamientos de compromisos.**
 
-Si hay eventos:
+**Criterios de aceptación:**
 
-Listarlos agrupados por fecha.
+- ✅ Detectar conflictos al agregar/editar eventos con hora
+- ✅ Mostrar advertencia: _"Ya existe un evento en este horario. ¿Deseas continuar?"_
+- ✅ Permitir continuar si usuario confirma
+- ✅ Funcionar tanto para creación como edición
 
-Dentro de cada día, ordenarlos por hora.
+### **10. Guardar Eventos entre Sesiones**
 
-Mostrar: Fecha → Título → Hora → Descripción.
+**Como usuario del calendario, quiero que mis eventos se guarden incluso si cierro el programa, para no perder información cuando vuelva a abrirlo.**
 
-- 6. Buscar evento por nombre
-     Como usuario del calendario, quiero poder buscar un evento por su nombre, para encontrar rápidamente información específica sin revisar día por día.
+**Criterios de aceptación:**
 
-Criterios de aceptación:
+- ✅ Persistencia automática en `data/eventos.json`
+- ✅ Carga automática al iniciar aplicación
+- ✅ Actualización automática en todas las operaciones CRUD
+- ✅ Crear archivo si no existe, sin errores
+- ✅ Proceso silencioso para el usuario
 
-El sistema debe permitir ingresar una cadena de búsqueda (parcial o completa).
+---
 
-La búsqueda no debe ser sensible a mayúsculas/minúsculas.
+## 🚀 **Instalación y Uso**
 
-Debe mostrar todos los eventos cuyo título contenga esa cadena.
+```bash
+# Instalar dependencia
+pip install ttkbootstrap
 
-Para cada resultado, debe mostrar: Fecha, Hora, Título, Descripción.
+# Ejecutar sistema
+python main.py
+```
 
-Si no hay coincidencias, debe decir: "No se encontraron eventos con ese nombre."
+**Características del sistema:**
 
-- 7. Ver calendario en formato mensual
-     Como usuario, quiero ver un calendario visual del mes con los días resaltados que tienen eventos, para identificar fácilmente los días ocupados.
-
-Criterios de aceptación:
-
-El sistema debe generar una vista tipo calendario para el mes solicitado (puede ser en consola o más visual si es gráfico).
-
-Los días con eventos deben destacarse visualmente (ej: con un asterisco, color o símbolo).
-
-El usuario debe poder navegar entre meses (anterior/siguiente).
-
-Si no hay eventos, mostrar el calendario en limpio.
-
-Si hay eventos, debe haber una opción para ver los detalles de un día desde el calendario.
-
-- 8. Notificación de eventos próximos
-     Como usuario, quiero recibir una notificación o mensaje cuando un evento se aproxima, para asegurarme de no olvidarlo.
-
-Criterios de aceptación:
-
-El sistema debe verificar si hay eventos dentro de un rango configurable (por defecto: 24 horas).
-
-Al iniciar el sistema o en momentos clave, debe mostrar los eventos próximos con mensajes como:
-"Recordatorio: Evento 'Reunión' mañana a las 10:00"
-
-La lógica debe considerar la hora actual del sistema.
-
-Los eventos pasados no deben mostrarse como recordatorio.
-
-- 9. Evitar conflictos de horario
-     Como usuario, quiero recibir una advertencia si intento crear un evento que se superpone con otro, para evitar solapamientos de compromisos.
-
-Criterios de aceptación:
-
-Al agregar un nuevo evento con fecha y hora, el sistema debe verificar si ya hay otro evento en la misma fecha y hora.
-
-Si se detecta conflicto, debe mostrar:
-"Advertencia: Ya existe un evento en este horario. ¿Deseas continuar? (S/N)"
-
-Si el usuario elige continuar, se permite la superposición; si no, el evento no se crea.
-
-Debe funcionar también al editar un evento existente.
-
-- 10. Guardar eventos entre sesiones
-      Como usuario del calendario, quiero que mis eventos se guarden incluso si cierro el programa, para no perder información cuando vuelva a abrirlo.
-
-Criterios de aceptación:
-
-Los eventos deben persistir en un archivo local (ej. JSON, CSV, SQLite).
-
-Al iniciar el programa, el sistema debe cargar automáticamente los eventos guardados.
-
-Al agregar, editar o eliminar eventos, el sistema debe actualizar el archivo.
-
-Si el archivo no existe, debe crearse uno nuevo sin errores.
-
-La carga y guardado deben ser silenciosos y automáticos para el usuario.
+- 🎨 **20+ temas visuales** - Claros y oscuros
+- 🔊 **Notificaciones sonoras** - Windows + multiplataforma
+- ⚡ **Validación en tiempo real** - Feedback inmediato
+- 🏗️ **Arquitectura empresarial** - Código limpio y escalable

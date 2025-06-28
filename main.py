@@ -17,7 +17,7 @@ Autor: Mariano Capella, Gabriel Osemberg
 """
 
 import ttkbootstrap as tb
-from calendario_ui import CalendarioUI
+from src.ui.calendario_ui import CalendarioUI
 
 
 def main():
@@ -41,7 +41,15 @@ def main():
     print("   Desarrollado por: Mariano Capella & Gabriel Osemberg")
     print("   Tecnologías: Python + ttkbootstrap")
     print(f"   Tema inicial: {app.get_theme_manager().get_tema_actual()}")
+    print("🔔 Notificaciones de eventos ACTIVAS")
+    print("   • Verificación automática cada 60 segundos")
+    print("   • Sonido cuando llegue la hora de eventos")
+    print("   • Solo suena UNA VEZ por evento")
     print("   ¡Disfruta usando el calendario! 🎉")
+    
+    # Probar notificaciones (comentar en producción)
+    # print("\n🧪 Probando notificaciones...")
+    # app.notification_timer.probar_notificacion()
     
     # Iniciar el loop principal de la aplicación
     try:

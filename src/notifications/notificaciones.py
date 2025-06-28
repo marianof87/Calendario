@@ -12,10 +12,12 @@ Autor: Mariano Capella, Gabriel Osemberg
 """
 
 import datetime
+import winsound
+import sys
 from typing import List, Tuple, Optional, Callable
 from dataclasses import dataclass
-from eventos import Evento, EventosManager
-from helpers import formatear_fecha_completa
+from src.core.eventos import Evento, EventosManager
+from src.utils.helpers import formatear_fecha_completa
 
 
 @dataclass
@@ -54,6 +56,24 @@ class Notificacion:
             2: 'danger'     # Rojo - Alta
         }
         return colores.get(self.urgencia, 'info')
+    
+    def reproducir_sonido(self) -> None:
+        """Reproduce sonido de forma no bloqueante según el tipo y urgencia."""
+        try:
+            if sys.platform == "win32":
+                if self.urgencia >= 2:  # Alta urgencia
+                    winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+                    # Solo un beep corto para evitar bloqueos
+                    winsound.Beep(800, 200)  # Beep más corto
+                elif self.urgencia >= 1:  # Media urgencia
+                    winsound.MessageBeep(winsound.MB_ICONASTERISK)
+                else:  # Baja urgencia
+                    winsound.MessageBeep(winsound.MB_OK)
+            else:
+                # Para otros sistemas, usar beep del sistema
+                print('\a')  # ASCII bell
+        except Exception as e:
+            print(f"⚠️ Audio no disponible: {e}")  # Menos verbose
 
 
 class ValidadorEventos:
@@ -402,6 +422,9 @@ class NotificacionesManager:
         Args:
             notificacion: Notificación a mostrar
         """
+        # Reproducir sonido primero
+        notificacion.reproducir_sonido()
+        
         print(f"\n{notificacion.get_icono()} {notificacion.titulo}")
         print(f"   {notificacion.mensaje}")
         

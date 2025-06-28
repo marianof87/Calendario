@@ -17,12 +17,13 @@ from ttkbootstrap.constants import *
 from ttkbootstrap.dialogs import Messagebox
 import datetime
 from typing import Optional, List
-from calendario_logic import CalendarioLogic
-from theme_manager import ThemeManager
-from helpers import obtener_dias_semana, formatear_fecha_completa
-from eventos import EventosManager
-from notificaciones import NotificacionesManager
-from evento_dialogs import EventoDialog, EventosDelDiaDialog, BuscarEventosDialog
+from src.core.calendario_logic import CalendarioLogic
+from src.ui.theme_manager import ThemeManager
+from src.utils.helpers import obtener_dias_semana, formatear_fecha_completa
+from src.core.eventos import EventosManager
+from src.notifications.notificaciones import NotificacionesManager
+from src.notifications.notificacion_timer import NotificacionTimer
+from src.dialogs.evento_dialogs import EventoDialog, EventosDelDiaDialog, BuscarEventosDialog
 
 
 class CalendarioUI:
@@ -50,6 +51,10 @@ class CalendarioUI:
         self.calendar_logic.set_callback_actualizar_vista(self.actualizar_vista)
         self.notificaciones_manager.set_callback_mostrar_notificacion(self._mostrar_notificacion_ui)
         
+        # Inicializar timer de notificaciones en tiempo real (thread-safe)
+        self.notification_timer = NotificacionTimer(self.notificaciones_manager, self.root)
+        self.notification_timer.start()
+        
         # Inicializar tema
         self.theme_manager.inicializar_style("litera")
         self._actualizar_titulo()
@@ -62,6 +67,9 @@ class CalendarioUI:
         
         # Crear la interfaz
         self.crear_widgets()
+        
+        # Configurar limpieza al cerrar
+        self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         
         # Verificar eventos próximos al inicio
         self._verificar_eventos_inicio()
@@ -215,6 +223,33 @@ class CalendarioUI:
             command=self._mostrar_eventos_mes
         )
         btn_mes.pack(side=LEFT, padx=2)
+        
+        # Botón Probar Notificación (para debugging)
+        btn_test = tb.Button(
+            parent_frame,
+            text="🔔 Test",
+            bootstyle=(OUTLINE, INFO),
+            command=self._probar_notificacion
+        )
+        btn_test.pack(side=LEFT, padx=2)
+        
+        # Botón Reanudar Timer (para control manual)
+        btn_reanudar = tb.Button(
+            parent_frame,
+            text="▶️ Reanudar",
+            bootstyle=(OUTLINE, WARNING),
+            command=self._reanudar_timer
+        )
+        btn_reanudar.pack(side=LEFT, padx=2)
+        
+        # Botón Estadísticas Timer (para monitoring)
+        btn_stats = tb.Button(
+            parent_frame,
+            text="📊 Stats",
+            bootstyle=(OUTLINE, SECONDARY),
+            command=self._mostrar_stats_timer
+        )
+        btn_stats.pack(side=LEFT, padx=2)
     
     def _crear_area_calendario(self) -> None:
         """Crea el área del calendario."""
@@ -431,8 +466,8 @@ class CalendarioUI:
     
     def _agregar_evento(self) -> None:
         """Abre el diálogo para agregar un nuevo evento."""
-        dialog = EventoDialog(self.root, "Agregar Evento")
-        resultado = dialog.mostrar()
+        dialog = EventoDialog(self.root)  # Sin parámetro de título
+        resultado = dialog.mostrar() if hasattr(dialog, 'mostrar') else dialog.show()
         
         if resultado:
             # Validar conflictos de horario
@@ -673,9 +708,56 @@ class CalendarioUI:
     
     def get_notificaciones_manager(self) -> NotificacionesManager:
         """
-        Obtiene la instancia del gestor de notificaciones.
+        Obtiene el gestor de notificaciones.
         
         Returns:
-            NotificacionesManager: Instancia del gestor
+            NotificacionesManager: Gestor de notificaciones
         """
         return self.notificaciones_manager
+    
+    def _probar_notificacion(self) -> None:
+        """Prueba el sistema de notificaciones."""
+        try:
+            print("\n🧪 === PRUEBA DE NOTIFICACIONES ===")
+            self.notification_timer.mostrar_estadisticas_detalladas()
+            self.notification_timer.probar_notificacion()
+            print("✅ Prueba completada - deberías escuchar un sonido")
+        except Exception as e:
+            print(f"❌ Error probando notificaciones: {e}")
+    
+    def _reanudar_timer(self) -> None:
+        """Reanuda el timer de notificaciones si estaba pausado."""
+        try:
+            if hasattr(self, 'notification_timer') and self.notification_timer:
+                self.notification_timer.reanudar_timer()
+                print("▶️ Timer de notificaciones reanudado")
+            else:
+                print("⚠️ Timer de notificaciones no disponible")
+        except Exception as e:
+            print(f"❌ Error reanudando timer: {e}")
+    
+    def _mostrar_stats_timer(self) -> None:
+        """Muestra estadísticas detalladas del timer."""
+        try:
+            if hasattr(self, 'notification_timer') and self.notification_timer:
+                print("\n📊 === ESTADÍSTICAS DEL TIMER ===")
+                self.notification_timer.mostrar_estadisticas_detalladas()
+            else:
+                print("⚠️ Timer de notificaciones no disponible")
+        except Exception as e:
+            print(f"❌ Error mostrando estadísticas: {e}")
+    
+    def _on_closing(self) -> None:
+        """Maneja el cierre de la aplicación limpiamente."""
+        try:
+            # Detener timer de notificaciones
+            if hasattr(self, 'notification_timer'):
+                self.notification_timer.stop()
+                print("🛑 Timer de notificaciones detenido")
+            
+            # Cerrar ventana
+            self.root.destroy()
+            print("👋 Aplicación cerrada limpiamente")
+        except Exception as e:
+            print(f"❌ Error al cerrar: {e}")
+            self.root.destroy()

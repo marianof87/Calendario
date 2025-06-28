@@ -15,10 +15,10 @@ from ttkbootstrap.constants import *
 from ttkbootstrap.dialogs import Messagebox
 import datetime
 from typing import Optional, List, Dict, Any
-from eventos import Evento, EventosManager
-from helpers import formatear_fecha_completa
-from dialog_base import BaseDialog, DialogConstants
-from dialog_components import FormField, TreeviewComponent, DialogHeader, SmartEntry, SmartText
+from src.core.eventos import Evento, EventosManager
+from src.utils.helpers import formatear_fecha_completa
+from src.dialogs.dialog_base import BaseDialog, DialogConstants
+from src.dialogs.dialog_components import FormField, TreeviewComponent, DialogHeader, SmartEntry, SmartText
 
 
 class EnhancedEventDialog(BaseDialog):
@@ -164,9 +164,39 @@ class EnhancedEventDialog(BaseDialog):
     
     def _create_buttons(self, parent) -> None:
         """Crea los botones del diálogo."""
-        button_frame = self._create_button_frame(parent)
+        # Crear frame para botones con separador
+        separator = tb.Separator(parent, orient=HORIZONTAL)
+        separator.pack(fill=X, pady=(15, 10))
+        
+        button_frame = tb.Frame(parent)
+        button_frame.pack(fill=X, pady=(0, 10))
+        
+        # Crear botones manualmente para asegurar visibilidad
         accept_text = "Actualizar" if self.is_editing else "Guardar"
-        self._create_standard_buttons(button_frame, accept_text, "Cancelar")
+        
+        # Botón Cancelar (izquierda)
+        btn_cancel = tb.Button(
+            button_frame,
+            text="Cancelar",
+            bootstyle=(OUTLINE, SECONDARY),
+            command=self._on_cancel,
+            width=12
+        )
+        btn_cancel.pack(side=LEFT)
+        
+        # Botón Guardar/Actualizar (derecha)
+        btn_accept = tb.Button(
+            button_frame,
+            text=accept_text,
+            bootstyle=SUCCESS,
+            command=self._on_accept,
+            width=12
+        )
+        btn_accept.pack(side=RIGHT)
+        
+        # Configurar bindings de teclado
+        self.window.bind('<Return>', lambda e: self._on_accept())
+        self.window.bind('<Escape>', lambda e: self._on_cancel())
     
     def _set_today(self) -> None:
         """Establece la fecha de hoy."""
@@ -176,13 +206,19 @@ class EnhancedEventDialog(BaseDialog):
     def _load_event_data(self) -> None:
         """Carga los datos del evento para edición."""
         if self.evento:
-            self.field_titulo.set_value(self.evento.titulo)
-            self.field_fecha.set_value(self.evento.fecha)
-            if self.evento.hora:
-                self.field_hora.set_value(self.evento.hora)
-            if self.evento.descripcion:
-                self.text_descripcion.delete("1.0", END)
-                self.text_descripcion.insert("1.0", self.evento.descripcion)
+            # Verificar si self.evento es un objeto válido o string
+            if hasattr(self.evento, 'titulo'):
+                self.field_titulo.set_value(self.evento.titulo)
+                self.field_fecha.set_value(self.evento.fecha)
+                if hasattr(self.evento, 'hora') and self.evento.hora:
+                    self.field_hora.set_value(self.evento.hora)
+                if hasattr(self.evento, 'descripcion') and self.evento.descripcion:
+                    self.text_descripcion.delete("1.0", END)
+                    self.text_descripcion.insert("1.0", self.evento.descripcion)
+            else:
+                # Si self.evento es string u otro tipo, registrar error
+                self.logger.error(f"Evento inválido recibido: {type(self.evento)} - {self.evento}")
+                self.evento = None  # Reset para evitar más errores
     
     def _set_initial_focus(self) -> None:
         """Establece el focus inicial."""

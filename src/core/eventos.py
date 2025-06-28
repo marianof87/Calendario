@@ -16,7 +16,7 @@ import datetime
 import os
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, asdict
-from helpers import validar_fecha, formatear_fecha_completa
+from src.utils.helpers import validar_fecha, formatear_fecha_completa
 
 
 @dataclass

@@ -19,10 +19,10 @@ from ttkbootstrap.constants import *
 from ttkbootstrap.dialogs import Messagebox
 import datetime
 from typing import Optional, List, Dict, Any
-from eventos import Evento, EventosManager
-from helpers import formatear_fecha_completa
-from dialog_base import BaseDialog, DialogException, DialogConstants
-from dialog_components import (
+from src.core.eventos import Evento, EventosManager
+from src.utils.helpers import formatear_fecha_completa
+from src.dialogs.dialog_base import BaseDialog, DialogException, DialogConstants
+from src.dialogs.dialog_components import (
     FormField, TreeviewComponent, DialogHeader, 
     SmartEntry, SmartText
 )
